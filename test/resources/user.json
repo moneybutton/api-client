@@ -1,0 +1,9 @@
+{
+  "data": {
+    "type": "users",
+    "id": "0",
+    "attributes": {
+      "email": "some@email.com"
+    }
+  }
+}
