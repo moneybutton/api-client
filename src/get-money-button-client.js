@@ -628,6 +628,20 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       return fromResourceObjectsOfType(fromJsonApiData(json), 'clients')
     }
 
+    /**
+     * Retrives paginated utxos for the specified user
+     *
+     * @param {string} userId
+     * @returns {list}
+     */
+    async getUserUtxos (userId, query = {}) {
+      const json = await this._doGetRequest(
+        `/v1/users/${userId}/utxos`,
+        query
+      )
+      return fromResourceObjectsOfType(fromJsonApiData(json), 'utxos')
+    }
+
     async getUserApplications (userId, query = {}) {
       const json = await this._doGetRequest(
         `/v1/users/${userId}/applications`,
