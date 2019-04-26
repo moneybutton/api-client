@@ -723,6 +723,23 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Retrives the handles of the user with the given user id.
+     *
+     * @param {string} userId
+     * @param {object} query
+     * @returns {object}
+     */
+    async checkHandleAvailability (search, query = {}) {
+      let body = toJsonApiData(toNewResourceObject('handleChecks', { search }))
+      const json = await this._doPostRequest(
+        `/v1/handles/check`,
+        body,
+        query
+      )
+      return fromResourceObject(fromJsonApiData(json), 'handleAvailabilities')
+    }
+
+    /**
      * Creates a handle for the user with the given user id.
      *
      * @param {string} userId
