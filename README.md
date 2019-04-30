@@ -62,7 +62,3 @@ For in-detail API documentation, please see our automatically generated [docs](h
 PRs accepted.
 
 Small note: If editing the README, please conform to the [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
-
-## License
-
-MIT © 2018 Yours Inc.
