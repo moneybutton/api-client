@@ -572,12 +572,34 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Retrives the user with the given handle.
+     *
+     * @param {string} handle
+     * @returns {object}
+     */
+    async getUserByHandle (handle) {
+      let json = await this._doGetRequest(`/v1/users/handle/${handle}`)
+      return fromResourceObject(fromJsonApiData(json), 'users')
+    }
+
+    /**
      * Retrives the user with the given user id.
      *
      * @param {string} userId
      * @returns {object}
      */
     async getUser (userId) {
+      let json = await this._doGetRequest(`/v1/users/${userId}`)
+      return fromResourceObject(fromJsonApiData(json), 'users')
+    }
+
+    /**
+     * Retrives the user with the given user id.
+     *
+     * @param {string} userId
+     * @returns {object}
+     */
+    async getUserIdFromPaymail (userId) {
       let json = await this._doGetRequest(`/v1/users/${userId}`)
       return fromResourceObject(fromJsonApiData(json), 'users')
     }
