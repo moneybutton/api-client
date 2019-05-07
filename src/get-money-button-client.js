@@ -1209,6 +1209,29 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Looks up ui data for given user.
+     *
+     * @param {String} userId
+     */
+    async getUiData (userId) {
+      const json = await this._doGetRequest(`/v1/users/${userId}/ui-data`)
+      return fromResourceObject(fromJsonApiData(json), 'ui-data')
+    }
+
+    /**
+     * Updates ui data for given user.
+     *
+     * @param {String} userId
+     * @param {object} data
+     */
+    async updateUiData (userId, data) {
+      const json = await this._doPatchRequest(`/v1/users/${userId}/ui-data`,
+        toJsonApiData(toNewResourceObject('ui-data', data))
+      )
+      return fromResourceObject(fromJsonApiData(json), 'ui-data')
+    }
+
+    /**
      * @private
      * @param {string} endpoint - REST API relative endpoint.
      * @param {object} query - URL query parameters.
