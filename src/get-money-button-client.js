@@ -1213,7 +1213,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      *
      * @param {String} userId
      */
-    async getUiData (userId) {
+    async fetchUiData (userId) {
       const json = await this._doGetRequest(`/v1/users/${userId}/ui-data`)
       return fromResourceObject(fromJsonApiData(json), 'ui-data')
     }
