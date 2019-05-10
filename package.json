@@ -20,6 +20,7 @@
     "build:prod": "NODE_ENV=production dotenv -e ../../.env.prod -- yarn build",
     "build:watch": "yarn build -w",
     "dev": "NODE_ENV=dev dotenv -e ../../.env.dev -- yarn build:watch",
+    "prepublish": "yarn build:prod",
     "predocs": "jsdoc -d docs src/",
     "docs": "cd docs && http-server ."
   },
