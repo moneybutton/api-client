@@ -26,7 +26,7 @@
   },
   "repository": "https://github.com/moneybutton/api-client",
   "author": "Yours Inc.",
-  "license": "BSV",
+  "license": "Open-BSV",
   "publishConfig": {
     "access": "public"
   },
