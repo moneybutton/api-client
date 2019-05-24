@@ -745,6 +745,22 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Update a handle with the proper data
+     *
+     * @param {string} handleId
+     * @param {object} attributes
+     * @returns {object}
+     */
+    async updateUserHandle (userId, handleId, attributes = {}) {
+      const body = toJsonApiData(toResourceObject(handleId, 'handles', attributes))
+      const json = await this._doPatchRequest(
+        `/v1/users/${userId}/handles/${handleId}`,
+        body
+      )
+      return fromResourceObject(fromJsonApiData(json), 'handles')
+    }
+
+    /**
      * Retrives the handles of the user with the given user id.
      *
      * @param {string} userId
