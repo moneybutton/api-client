@@ -664,6 +664,12 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       return fromResourceObjectsOfType(fromJsonApiData(json), 'utxos')
     }
 
+    /**
+     * Retrives all the applications belonging to the specified user.
+     *
+     * @param {string} userId
+     * @returns {list}
+     */
     async getUserApplications (userId, query = {}) {
       const json = await this._doGetRequest(
         `/v1/users/${userId}/applications`,
