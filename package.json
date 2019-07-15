@@ -1,6 +1,6 @@
 {
   "name": "@moneybutton/api-client",
-  "version": "0.23.0",
+  "version": "0.23.2",
   "description": "Money Button API JavaScript client.",
   "main": "dist/moneybutton.client.cjs.js",
   "module": "dist/moneybutton.client.esm.js",
