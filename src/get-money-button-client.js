@@ -28,6 +28,8 @@ const OAUTH_STATE_KEY = [STORAGE_NAMESPACE, 'oauth_state'].join(':')
 const OAUTH_ACCESS_TOKEN_KEY = [STORAGE_NAMESPACE, 'oauth_access_token'].join(':')
 const OAUTH_EXPIRATION_TIME_KEY = [STORAGE_NAMESPACE, 'oauth_expiration_time'].join(':')
 const OAUTH_REFRESH_TOKEN_KEY = [STORAGE_NAMESPACE, 'oauth_refresh_token'].join(':')
+const APP_REFRESH_STRATEGY = 'client_credentials'
+const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
 
 /**
  * @param {Storage} webStorage - Object conforming to the Storage Web API.
@@ -57,6 +59,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     constructor (clientId, clientSecret = null) {
       this.clientId = clientId
       this.clientSecret = clientSecret
+      this.refreshStrategy = DEFAULT_REFRESH_STRATEGY
     }
 
     /**
@@ -72,6 +75,11 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         password
       )
       await this._logIn(email, loginPassword)
+    }
+
+    async logInAsApp () {
+      await this._doClientCredentialsGrantAccessTokenRequest('application_access:write')
+      this.refreshStrategy = APP_REFRESH_STRATEGY
     }
 
     /**
@@ -117,20 +125,25 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       ) {
         return accessToken
       }
-      const refreshToken = this.getRefreshToken()
-      if (refreshToken === null) {
-        return null
-      }
-      accessToken = null
-      try {
-        await this._doRefreshAccessTokenRequest(refreshToken)
-        accessToken = this.getAccessToken()
-      } catch (err) {
-        if (!(err instanceof AuthError)) {
-          throw err
+      if (this.refreshStrategy === APP_REFRESH_STRATEGY) {
+        await this.logInAsApp()
+        return this.getAccessToken()
+      } else {
+        const refreshToken = this.getRefreshToken()
+        if (refreshToken === null) {
+          return null
         }
+        accessToken = null
+        try {
+          await this._doRefreshAccessTokenRequest(refreshToken)
+          accessToken = this.getAccessToken()
+        } catch (err) {
+          if (!(err instanceof AuthError)) {
+            throw err
+          }
+        }
+        return accessToken
       }
-      return accessToken
     }
 
     /**
@@ -536,6 +549,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         expires_in: expiresIn,
         refresh_token: refreshToken
       } = await res.json()
+
       if (error !== undefined && error !== null) {
         throw new AuthError(error, errorDescription)
       }
@@ -971,6 +985,16 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
           fromResourceObject(payment, 'payments')
         )
       }
+    }
+
+    /**
+     *
+     */
+    async getPaymentById (paymentId) {
+      const json = await this._doGetRequest(
+        `/v1/payments/${paymentId}`
+      )
+      return fromResourceObject(fromJsonApiData(json), 'payments')
     }
 
     /**
