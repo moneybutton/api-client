@@ -77,6 +77,10 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       await this._logIn(email, loginPassword)
     }
 
+    /**
+     * Get tokens to log in as an app.
+     * It changes the internal state of the client.
+     */
     async logInAsApp () {
       await this._doClientCredentialsGrantAccessTokenRequest('application_access:write')
       this.refreshStrategy = APP_REFRESH_STRATEGY
@@ -351,7 +355,8 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      */
     requestAuthorization (
       scope,
-      redirectUri
+      redirectUri,
+      state = null
     ) {
       if (typeof scope !== 'string' || scope.length === 0) {
         throw new Error(`Invalid scope requested: ${scope}.`)
@@ -359,7 +364,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       if (typeof redirectUri !== 'string' || redirectUri.length === 0) {
         throw new Error(`Invalid return URI: ${redirectUri}.`)
       }
-      this._doAuthorizationCodeGrantAuthorizationRequest(redirectUri, scope)
+      this._doAuthorizationCodeGrantAuthorizationRequest(redirectUri, scope, state)
     }
 
     /**
@@ -372,7 +377,16 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      */
     async handleAuthorizationResponse () {
       const { error, code, state } = this._getUrlQuery()
-      await this._handleAuthorizationCodeGrantAuthorizationResponse(error, code, state)
+      const redirectUri = this._getRedirectUri()
+      if (!redirectUri) {
+        throw new Error('Required OAuth redirect URI not found in storage.')
+      }
+      await this._handleAuthorizationCodeGrantAuthorizationResponse(error, code, state, this._getState(), this._getRedirectUri())
+    }
+
+    async authorizeWithAuthFlowResponse (queryParams, expectedState, redirectUri) {
+      const { error, code, state } = queryParams
+      await this._handleAuthorizationCodeGrantAuthorizationResponse(error, code, state, expectedState, redirectUri)
     }
 
     /**
@@ -384,7 +398,8 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      */
     _doAuthorizationCodeGrantAuthorizationRequest (
       redirectUri,
-      scope
+      scope,
+      state = null
     ) {
       if (this.clientSecret !== null) {
         throw new Error([
@@ -392,7 +407,9 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
           'a public client (that is, a client with no client secret).'
         ].join(''))
       }
-      const state = uuid.v4()
+      if (state === null) {
+        state = uuid.v4()
+      }
       this._setRedirectUri(redirectUri)
       this._setState(state)
       const authorizationUri = [
@@ -416,19 +433,20 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     async _handleAuthorizationCodeGrantAuthorizationResponse (
       error,
       code,
-      state
+      state,
+      expectedState,
+      redirectUri
     ) {
-      const expectedState = this._getState()
-      if (expectedState === null || state !== expectedState) {
-        throw new Error('Invalid OAuth state.')
-      }
       if (error !== undefined) {
         throw new AuthError('Authorization failed.', error)
       }
       if (code === undefined) {
         throw new Error('Missing OAuth authorization code.')
       }
-      await this._doAuthorizationCodeGrantAccessTokenRequest(code)
+      if (expectedState === null || state !== expectedState) {
+        throw new Error('Invalid OAuth state.')
+      }
+      await this._doAuthorizationCodeGrantAccessTokenRequest(code, redirectUri)
     }
 
     /**
@@ -437,11 +455,11 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @private
      */
     async _doAuthorizationCodeGrantAccessTokenRequest (
-      code
+      code,
+      redirectUri
     ) {
-      const redirectUri = this._getRedirectUri()
-      if (redirectUri === null) {
-        throw new Error('Required OAuth redirect URI not found in storage.')
+      if (!redirectUri) {
+        throw new Error('Required OAuth redirect URI not found.')
       }
       await this._doAccessTokenRequest(
         {
