@@ -6,7 +6,9 @@ import {
   toJsonApiData,
   toJsonApiDataIncluding,
   fromJsonApiData,
-  fromJsonApiDataIncluding
+  fromJsonApiDataIncluding,
+  jsonSerializers,
+  JsonDeserializer
 } from '@moneybutton/json-api'
 import fetch from 'isomorphic-fetch'
 import moment from 'moment'
@@ -30,6 +32,10 @@ const OAUTH_EXPIRATION_TIME_KEY = [STORAGE_NAMESPACE, 'oauth_expiration_time'].j
 const OAUTH_REFRESH_TOKEN_KEY = [STORAGE_NAMESPACE, 'oauth_refresh_token'].join(':')
 const APP_REFRESH_STRATEGY = 'client_credentials'
 const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
+
+const {
+  UserSerializer
+} = jsonSerializers
 
 /**
  * @param {Storage} webStorage - Object conforming to the Storage Web API.
@@ -622,18 +628,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      */
     async getUser (userId) {
       let json = await this._doGetRequest(`/v1/users/${userId}`)
-      return fromResourceObject(fromJsonApiData(json), 'users')
-    }
-
-    /**
-     * Retrives the user with the given user id.
-     *
-     * @param {string} userId
-     * @returns {object}
-     */
-    async getUserIdFromPaymail (userId) {
-      let json = await this._doGetRequest(`/v1/users/${userId}`)
-      return fromResourceObject(fromJsonApiData(json), 'users')
+      return JsonDeserializer.deserialize(json)
     }
 
     /**
@@ -644,9 +639,9 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @returns {object}
      */
     async updateUser (userId, attributes = {}) {
-      const body = toJsonApiData(toResourceObject(userId, 'users', attributes))
+      const body = UserSerializer.serialize(attributes)
       const json = await this._doPatchRequest(`/v1/users/${userId}`, body)
-      return fromResourceObject(fromJsonApiData(json), 'users')
+      return JsonDeserializer.deserialize(json)
     }
 
     /**
