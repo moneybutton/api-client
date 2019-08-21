@@ -610,6 +610,17 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Get basic information from the OAuth app with the given identifier.
+     *
+     * @param {string} oAuthIdentifier
+     * @returns {object}
+     */
+    async getAppProfileByOAuthIdentifier (oAuthIdentifier) {
+      const json = await this._doGetRequest(`/v1/application_profiles/oauth_identifier=${oAuthIdentifier}`)
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
      * Retrives the user with the given handle.
      *
      * @param {string} handle
