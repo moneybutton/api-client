@@ -909,7 +909,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      */
     async getBalance (userId) {
       const json = await this._doGetRequest(`/v1/users/${userId}/balance`)
-      return fromResourceObject(fromJsonApiData(json), 'amounts')
+      return JsonDeserializer.deserialize(json)
     }
 
     /**
