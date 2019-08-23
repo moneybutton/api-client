@@ -1012,13 +1012,30 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Query for a list of payments belonging to the user or app logged in in the client.
      *
+     * @param {object} query Query parameters
+     * @param {object} query.limit Pagination. Max amount of record returned.
+     * @param {object} query.offset Pagination offset.
+     */
+    async getOwnPayments (query) {
+      const json = await this._doGetRequest(
+        `/v1/payments`,
+        query
+      )
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
+     * Query a payment by id.
+     *
+     * @param {number} paymentId
      */
     async getPaymentById (paymentId) {
       const json = await this._doGetRequest(
         `/v1/payments/${paymentId}`
       )
-      return fromResourceObject(fromJsonApiData(json), 'payments')
+      return JsonDeserializer.deserialize(json)
     }
 
     /**
