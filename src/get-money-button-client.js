@@ -643,6 +643,17 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Retrives the profile of user with the given user id.
+     *
+     * @param {string} userId
+     * @returns {object}
+     */
+    async getUserProfile (userId) {
+      let json = await this._doGetRequest(`/v1/users/${userId}/profile`)
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
      * Updates the user with the given user id.
      *
      * @param {string} userId
