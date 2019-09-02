@@ -1300,6 +1300,21 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Broadcasts the given payment. It must include a fully signed transaction.
+     *
+     * @param {Payment} payment
+     * @returns {object}
+     */
+    async broadcastPayment (payment) {
+      const body = jsonSerializers.PaymentSerializer.serialize(payment)
+      const json = await this._doPatchRequest(
+        `/v1/payments/${payment.id}/broadcast`,
+        body
+      )
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
      * Retrieves the list of supported cryptocurrencies.
      *
      * @param {object} query
