@@ -1144,7 +1144,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       let json = await this._doGetRequest(`/v1/users/${userId}/payments/${paymentId}`)
       let { data, included } = fromJsonApiDataIncluding(json)
       const payment = fromResourceObject(data, 'payments')
-      payment.outputs = fromResourceObjectsOfType(included, 'payment_outputs')
+      payment.paymentOutputs = fromResourceObjectsOfType(included, 'payment_outputs')
       return payment
     }
 
