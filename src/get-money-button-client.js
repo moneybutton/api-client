@@ -34,8 +34,7 @@ const APP_REFRESH_STRATEGY = 'client_credentials'
 const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
 
 const {
-  UserSerializer,
-  PaymentToBeCreatedSerializer
+  UserSerializer
 } = jsonSerializers
 
 /**
@@ -1075,12 +1074,13 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @param {array} paymentOutputs
      * @returns {object}
      */
-    async createUserPayment (userId, attributes, paymentOutputs, cryptoOperations = []) {
-      let body = PaymentToBeCreatedSerializer.serialize({
-        ...attributes,
-        paymentOutputs,
-        cryptoOperations
-      })
+    async createUserPayment (userId, attributes, paymentOutputs) {
+      let body = toJsonApiDataIncluding(
+        toNewResourceObject('payments', attributes),
+        paymentOutputs.map(paymentOutput => {
+          return toNewResourceObject('payment_outputs', paymentOutput)
+        })
+      )
       let json = await this._doPostRequest(`/v1/users/${userId}/payments`, body)
       let { data, included } = fromJsonApiDataIncluding(json)
       let payment = fromResourceObject(data, 'payments')
@@ -1107,12 +1107,13 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @param {array} paymentOutputs
      * @returns {object}
      */
-    async createSimulatedUserPayment (userId, attributes, paymentOutputs, cryptoOperations = []) {
-      let body = PaymentToBeCreatedSerializer.serialize({
-        ...attributes,
-        paymentOutputs,
-        cryptoOperations
-      })
+    async createSimulatedUserPayment (userId, attributes, paymentOutputs) {
+      let body = toJsonApiDataIncluding(
+        toNewResourceObject('payments', attributes),
+        paymentOutputs.map(paymentOutput => {
+          return toNewResourceObject('payment_outputs', paymentOutput)
+        })
+      )
       let json = await this._doPostRequest(`/v1/users/${userId}/payments/simulated`, body)
       let { data, included } = fromJsonApiDataIncluding(json)
       let payment = fromResourceObject(data, 'payments')
