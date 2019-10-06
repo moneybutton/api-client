@@ -35,7 +35,7 @@ const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
 
 const {
   UserSerializer,
-  PaymentToBeCreatedSerializer
+  PaymentSerializer
 } = jsonSerializers
 
 /**
@@ -1076,7 +1076,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @returns {object}
      */
     async createUserPayment (userId, attributes, paymentOutputs, cryptoOperations = []) {
-      let body = PaymentToBeCreatedSerializer.serialize({
+      let body = PaymentSerializer.serialize({
         ...attributes,
         paymentOutputs,
         cryptoOperations
@@ -1108,7 +1108,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @returns {object}
      */
     async createSimulatedUserPayment (userId, attributes, paymentOutputs, cryptoOperations = []) {
-      let body = PaymentToBeCreatedSerializer.serialize({
+      let body = PaymentSerializer.serialize({
         ...attributes,
         paymentOutputs,
         cryptoOperations
