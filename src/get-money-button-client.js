@@ -522,7 +522,8 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       await this._doAccessTokenRequest(
         {
           grant_type: 'refresh_token',
-          refresh_token: refreshToken
+          refresh_token: refreshToken,
+          client_id: this.clientId
         },
         this._buildBasicAuthHeaders()
       )
