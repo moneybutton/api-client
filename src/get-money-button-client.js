@@ -18,6 +18,7 @@ import uuid from 'uuid'
 import AuthError from './auth-error'
 import config from './config'
 import RestError from './rest-error'
+import sha256 from 'fast-sha256'
 
 const API_REST_URI = config.get('MONEY_BUTTON_API_REST_URI')
 const API_AUTH_URI = config.get('MONEY_BUTTON_API_AUTH_URI')
@@ -1648,22 +1649,11 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @returns {string}
      */
     static async _computeHmac256 (key, message) {
-      let cryptoKey = await webCrypto.subtle.importKey(
-        'raw',
+      const hash = sha256.hmac(
         Buffer.from(key),
-        {
-          name: 'HMAC',
-          hash: { name: 'SHA-256' }
-        },
-        false,
-        ['sign', 'verify']
-      )
-      let signature = await webCrypto.subtle.sign(
-        'HMAC',
-        cryptoKey,
         Buffer.from(message)
       )
-      return Buffer.from(new Uint8Array(signature)).toString('hex')
+      return Buffer.from(hash).toString('hex')
     }
   }
 
