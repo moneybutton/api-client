@@ -523,7 +523,8 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       await this._doAccessTokenRequest(
         {
           grant_type: 'refresh_token',
-          refresh_token: refreshToken
+          refresh_token: refreshToken,
+          client_id: this.clientId
         },
         this._buildBasicAuthHeaders()
       )
@@ -570,6 +571,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       const {
         error,
         error_description: errorDescription,
+        errors,
         access_token: accessToken,
         token_type: tokenType,
         expires_in: expiresIn,
@@ -578,6 +580,10 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
 
       if (error !== undefined && error !== null) {
         throw new AuthError(error, errorDescription)
+      }
+      if (errors) {
+        console.error(errors)
+        throw new AuthError(errors[0], errors[0])
       }
       if (tokenType !== 'Bearer') {
         throw new Error('Unexpected token type.')
