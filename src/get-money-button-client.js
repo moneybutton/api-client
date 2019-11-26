@@ -36,7 +36,8 @@ const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
 
 const {
   UserSerializer,
-  PaymentSerializer
+  PaymentSerializer,
+  EmailVerificationSerializer
 } = jsonSerializers
 
 /**
@@ -182,6 +183,15 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         accessToken
       )
       return fromResourceObject(fromJsonApiData(json), 'email_verifications')
+    }
+
+    /**
+     * Re send message to validate email address.
+     * @param {string} email
+     */
+    async resendEmailAddressVerification (email) {
+      const body = EmailVerificationSerializer.serialize({ email })
+      await this._doPostRequest('/v1/auth/resend_verification_email', body)
     }
 
     /**
