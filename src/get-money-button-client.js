@@ -1158,11 +1158,13 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       )
         .sort((a, b) => a.index - b.index)
         .map(addressIndex => addressIndex.addressIndex)
+      let amounts = fromResourceObjectsOfType(included, 'amounts')
       return {
         payment,
         paymentOutputs: fromResourceObjectsOfType(included, 'payment_outputs'),
         bsvTransaction,
-        addressIndexes
+        addressIndexes,
+        amount: amounts[0]
       }
     }
 
