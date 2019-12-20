@@ -186,6 +186,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         {},
         accessToken
       )
+      this._clearCurrentUser()
       return fromResourceObject(fromJsonApiData(json), 'email_verifications')
     }
 
