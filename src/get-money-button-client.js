@@ -694,12 +694,8 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     async updateUser (userId, attributes = {}) {
       const body = UserSerializer.serialize(attributes)
       const json = await this._doPatchRequest(`/v1/users/${userId}`, body)
-      const user = JsonDeserializer.deserialize(json)
-      const currentUser = this._getCurrentUser()
-      if (currentUser && user.id === currentUser.id) {
-        this._setCurrentUser(user)
-      }
-      return user
+      this._clearCurrentUser()
+      return JsonDeserializer.deserialize(json)
     }
 
     /**
