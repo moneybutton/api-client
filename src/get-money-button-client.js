@@ -197,6 +197,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     async resendEmailAddressVerification (email) {
       const body = EmailVerificationSerializer.serialize({ email })
       await this._doPostRequest('/v1/auth/resend_verification_email', body)
+      this._clearCurrentUser()
     }
 
     /**
