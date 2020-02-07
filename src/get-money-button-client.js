@@ -31,7 +31,6 @@ const OAUTH_STATE_KEY = [STORAGE_NAMESPACE, 'oauth_state'].join(':')
 const OAUTH_ACCESS_TOKEN_KEY = [STORAGE_NAMESPACE, 'oauth_access_token'].join(':')
 const OAUTH_EXPIRATION_TIME_KEY = [STORAGE_NAMESPACE, 'oauth_expiration_time'].join(':')
 const OAUTH_REFRESH_TOKEN_KEY = [STORAGE_NAMESPACE, 'oauth_refresh_token'].join(':')
-const CURRENT_USER_CACHE_KEY = [STORAGE_NAMESPACE, 'current_user'].join(':')
 const APP_REFRESH_STRATEGY = 'client_credentials'
 const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
 
@@ -70,6 +69,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       this.clientId = clientId
       this.clientSecret = clientSecret
       this.refreshStrategy = DEFAULT_REFRESH_STRATEGY
+      this._currentUser = null
     }
 
     /**
@@ -222,16 +222,8 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       if (!loggedIn) {
         return { loggedIn }
       }
-
-      const currentUser = this._getCurrentUser()
-      if (currentUser) {
-        return { loggedIn: true, user: currentUser }
-      }
-
-      const { id } = await this.getIdentity()
-      const user = await this.getUser(id)
-      this._setCurrentUser(user)
-      return { loggedIn, user }
+      const currentUser = await this._getCurrentUser()
+      return { loggedIn, user: currentUser }
     }
 
     /**
@@ -902,10 +894,15 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @returns {object}
      */
     async getUserWallet (userId, walletId) {
-      let json = await this._doGetRequest(
-        `/v1/users/${userId}/wallets/${walletId}`
-      )
-      return fromResourceObject(fromJsonApiData(json), 'wallets')
+      let data = this.getStoredWalletData(userId, walletId)
+      if (data == null) {
+        const json = await this._doGetRequest(
+          `/v1/users/${userId}/wallets/${walletId}`
+        )
+        data = fromResourceObject(fromJsonApiData(json), 'wallets')
+        this.saveWalletData(userId, walletId, data)
+      }
+      return data
     }
 
     /**
@@ -1584,10 +1581,31 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
-     * Save internal cache of current user.
+     * Get information of a user wallet from the local storage cache.
+     *
+     * @param {string} userId
+     * @param {string} walletId
      */
-    _setCurrentUser (userData) {
-      webStorage.setItem(CURRENT_USER_CACHE_KEY, JSON.stringify(userData))
+    getStoredWalletData (userId, walletId) {
+      const rawData = webStorage.getItem(`${STORAGE_NAMESPACE}:${userId}:${walletId}:wallet_data`)
+      try {
+        return JSON.parse(rawData)
+      } catch (e) {
+        return null
+      }
+    }
+
+    /**
+     * Stores wallet data into localStorage for cache.
+     *
+     * @param {string} userId
+     * @param {string} walletId
+     * @param {string} walletData
+     */
+    saveWalletData (userId, walletId, walletData) {
+      const dataToSave = JSON.stringify(walletData)
+      const key = `${STORAGE_NAMESPACE}:${userId}:${walletId}:wallet_data`
+      webStorage.setItem(key, dataToSave)
     }
 
     /**
@@ -1595,15 +1613,20 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      *
      * @returns {object}
      */
-    _getCurrentUser () {
-      return JSON.parse(webStorage.getItem(CURRENT_USER_CACHE_KEY))
+    async _getCurrentUser () {
+      if (this._currentUser === null) {
+        const { id } = await this.getIdentity()
+        const user = await this.getUser(id)
+        this._currentUser = user
+      }
+      return this._currentUser
     }
 
     /**
      * Clears internal cache for current user.
      */
     _clearCurrentUser () {
-      webStorage.removeItem(CURRENT_USER_CACHE_KEY)
+      this._currentUser = null
     }
 
     /**
