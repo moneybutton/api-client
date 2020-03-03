@@ -37,7 +37,9 @@ const DEFAULT_REFRESH_STRATEGY = 'refresh_token'
 const {
   UserSerializer,
   PaymentSerializer,
-  EmailVerificationSerializer
+  EmailVerificationSerializer,
+  SpentAuthorizationsSerializer,
+  AuthorizedPaymentSerializer
 } = jsonSerializers
 
 /**
@@ -782,6 +784,39 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         body
       )
       return fromResourceObject(fromJsonApiData(json), 'applications')
+    }
+
+    /**
+     * Creates a new spent authorization.
+     *
+     * @param {string} attributes.amount Max amount to authorized.
+     * @param {string} attributes.currency Currency of the authorized amount.
+     */
+    async createUserSpentAuthorization (attributes) {
+      const body = SpentAuthorizationsSerializer.serialize(attributes)
+      const json = await this._doPostRequest(
+        `/v1/spent-authorizations`,
+        body
+      )
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
+     * Creates a new authorized payment.
+     *
+     * @param {string} attributes.amount Max amount to authorized.
+     * @param {string} attributes.currency Currency of the authorized amount.
+     */
+    async createAuthorizedPayment (authorization, paymentAttributes, paymentOutputs, cryptoOperations) {
+      const body = AuthorizedPaymentSerializer.serialize({
+        authorization, paymentAttributes, paymentOutputs, cryptoOperations
+      })
+      const json = await this._doPostRequest(
+        `/v1/spent-authorizations/make-payment`,
+        body
+      )
+      // return JsonDeserializer.deserialize(json)
+      return json
     }
 
     async updateUserApplication (userId, appId, attributes) {
