@@ -787,7 +787,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
-     * Creates a new spent authorization.
+     * Creates a new swipe permission.
      *
      * @param {string} attributes.amount Max amount to authorized.
      * @param {string} attributes.currency Currency of the authorized amount.
@@ -798,6 +798,11 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         `/v1/swipe_permissions`,
         body
       )
+      return JsonDeserializer.deserialize(json)
+    }
+
+    async getCurrentUserSwipePermissions () {
+      const json = await this._doGetRequest('/v1/swipe_permissions')
       return JsonDeserializer.deserialize(json)
     }
 
