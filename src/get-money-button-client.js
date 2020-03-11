@@ -38,7 +38,7 @@ const {
   UserSerializer,
   PaymentSerializer,
   EmailVerificationSerializer,
-  SpentAuthorizationsSerializer,
+  SwipePermissionSerializer,
   AuthorizedPaymentSerializer
 } = jsonSerializers
 
@@ -793,9 +793,9 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @param {string} attributes.currency Currency of the authorized amount.
      */
     async createUserSpentAuthorization (attributes) {
-      const body = SpentAuthorizationsSerializer.serialize(attributes)
+      const body = SwipePermissionSerializer.serialize(attributes)
       const json = await this._doPostRequest(
-        `/v1/spent-authorizations`,
+        `/v1/swipe_permissions`,
         body
       )
       return JsonDeserializer.deserialize(json)
@@ -812,7 +812,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
         authorization, paymentAttributes, paymentOutputs, cryptoOperations
       })
       const json = await this._doPostRequest(
-        `/v1/spent-authorizations/make-payment`,
+        `/v1/swipe_permissions/make-payment`,
         body
       )
       // return JsonDeserializer.deserialize(json)
