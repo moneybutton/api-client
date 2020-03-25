@@ -636,13 +636,24 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
-     * Get basic information from the OAuth app with the given identifier.
+     * Get basic information from the OAuth app with the given oauth identifier.
      *
      * @param {string} oAuthIdentifier
      * @returns {object}
      */
     async getAppProfileByOAuthIdentifier (oAuthIdentifier) {
       const json = await this._doGetRequest(`/v1/application_profiles/oauth_identifier=${oAuthIdentifier}`)
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
+     * Get basic information from the OAuth app with the given public client identifier.
+     *
+     * @param {string} oAuthIdentifier
+     * @returns {object}
+     */
+    async getAppProfileByClientIdentifier (oAuthIdentifier) {
+      const json = await this._doGetRequest(`/v1/application_profiles/client_identifier=${oAuthIdentifier}`)
       return JsonDeserializer.deserialize(json)
     }
 
