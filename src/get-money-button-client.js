@@ -818,6 +818,26 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     }
 
     /**
+     * Get the info for an specific swipe permission.
+     *
+     * @param {string} id ID of the permission
+     */
+    async getCurrentUserSwipePermissionById (id) {
+      const json = await this._doGetRequest(`/v1/swipe_permissions/${id}`)
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
+     * Get the info for an specific swipe permission.
+     *
+     * @param {string} id ID of the permission
+     */
+    async deleteCurrentUserSwipePermissionById (id) {
+      const json = await this._doDeleteRequest(`/v1/swipe_permissions/${id}`)
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
      * Creates a new authorized payment.
      *
      * @param {string} attributes.amount Max amount to authorized.
@@ -1451,6 +1471,20 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
     async _doGetRequest (endpoint, query = {}, accessToken = null) {
       let opts = {
         method: 'GET'
+      }
+      return this._doRequest(endpoint, opts, query, accessToken)
+    }
+
+    /**
+     * @private
+     * @param {string} endpoint - REST API relative endpoint.
+     * @param {object} query - URL query parameters.
+     * @param {string} accessToken - auth API access token
+     * @returns {object}
+     */
+    async _doDeleteRequest (endpoint, query = {}, accessToken = null) {
+      let opts = {
+        method: 'DELETE'
       }
       return this._doRequest(endpoint, opts, query, accessToken)
     }
