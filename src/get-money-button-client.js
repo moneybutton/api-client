@@ -827,8 +827,14 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       return JsonDeserializer.deserialize(json)
     }
 
+    async updateCurrentUserSwipePermissionById (id, attributes) {
+      const reqBody = SwipePermissionSerializer.serialize(attributes)
+      const jsonResponse = await this._doPatchRequest(`/v1/swipe_permissions/${id}`, reqBody)
+      return JsonDeserializer.deserialize(jsonResponse)
+    }
+
     /**
-     * Get the info for an specific swipe permission.
+     * Deletes an specific swipe permission.
      *
      * @param {string} id ID of the permission
      */
