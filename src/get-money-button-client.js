@@ -839,8 +839,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * @param {string} id ID of the permission
      */
     async deleteCurrentUserSwipePermissionById (id) {
-      const json = await this._doDeleteRequest(`/v1/swipe_permissions/${id}`)
-      return JsonDeserializer.deserialize(json)
+      await this._doDeleteRequest(`/v1/swipe_permissions/${id}`)
     }
 
     /**
