@@ -2,7 +2,6 @@ import babel from 'rollup-plugin-babel'
 import builtins from 'rollup-plugin-node-builtins'
 import commonJS from '@rollup/plugin-commonjs'
 import fs from 'fs'
-import globals from 'rollup-plugin-node-globals'
 import { terser } from 'rollup-plugin-terser'
 import path from 'path'
 import pkg from './package.json'
@@ -87,7 +86,6 @@ export default [
     context: 'window',
     plugins: [
       replace(getReplacements()),
-      globals(),
       builtins(),
       resolve({
         browser: true,
