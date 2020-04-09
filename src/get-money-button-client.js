@@ -812,8 +812,21 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
       return JsonDeserializer.deserialize(json)
     }
 
+    /**
+     * Returns a list of swipe permissions associates with the current user.
+     */
     async getCurrentUserSwipePermissions () {
       const json = await this._doGetRequest('/v1/swipe_permissions')
+      return JsonDeserializer.deserialize(json)
+    }
+
+    /**
+     * Get the amount left for an specific permission.
+     *
+     * @param {string} token IMB permission token
+     */
+    async getSwipePermissionAmountLeft (token) {
+      const json = await this._doPostRequest(`/v1/swipe_permissions/amount-left`, { authToken: token })
       return JsonDeserializer.deserialize(json)
     }
 
