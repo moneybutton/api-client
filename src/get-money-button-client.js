@@ -168,6 +168,7 @@ export default function getMoneyButtonClient (webStorage, webCrypto, webLocation
      * Logs out the current logged-in user, if any.
      */
     logOut () {
+      this._clearCurrentUser()
       Array.from(Array(webStorage.length).keys()) // Generates a range of integers from 0 to webStorage.length
         .map(i => webStorage.key(i))
         .filter(key => key.startsWith('mb_wallet') || key.startsWith(STORAGE_NAMESPACE))
